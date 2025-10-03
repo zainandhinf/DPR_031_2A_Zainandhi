@@ -64,7 +64,7 @@ class KomponenGajiController extends Controller
 
         KomponenGaji::create($validated);
 
-        return redirect()->route('komponengajis.index')->with('success', 'Data added successfully!!');
+        return redirect()->route('komponen_gajis.index')->with('success', 'Data added successfully!!');
     }
 
     /**
@@ -72,7 +72,10 @@ class KomponenGajiController extends Controller
      */
     public function show(KomponenGaji $komponenGaji)
     {
-        //
+        return view('pages.view', [
+            'title' => 'Detail Komponen Gaji',
+            'item' => $komponenGaji
+        ]);
     }
 
     /**

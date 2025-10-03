@@ -21,6 +21,6 @@ Route::middleware('auth')->group(function () {
     
     Route::middleware('role:admin')->group(function () {
         Route::resource('penggunas', PenggunaController::class);
-        Route::resource('komponengajis', KomponenGajiController::class);
+        Route::resource('komponen_gajis', KomponenGajiController::class);
     });
 });

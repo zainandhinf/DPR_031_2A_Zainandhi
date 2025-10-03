@@ -4,7 +4,7 @@
     <div class="container mt-4">
         <div class="d-flex justify-content-between align-items-center mb-3">
             <h2>Data Komponen Gaji</h2>
-            <a href="{{ route('komponengajis.create') }}" class="btn btn-primary">Add Data</a>
+            <a href="{{ route('komponen_gajis.create') }}" class="btn btn-primary">Add Data</a>
         </div>
 
         <form method="GET" action="{{ url()->current() }}" class="d-flex mb-3">
@@ -45,9 +45,9 @@
         `;
         } else {
             items.forEach(item => {
-                let showUrl = "{{ route('komponengajis.show', ':id') }}".replace(':id', item.id_komponen_gaji);
-                let editUrl = "{{ route('komponengajis.edit', ':id') }}".replace(':id', item.id_komponen_gaji);
-                let destroyUrl = "{{ route('komponengajis.destroy', ':id') }}".replace(':id', item.id_komponen_gaji);
+                let showUrl = "{{ route('komponen_gajis.show', ':id') }}".replace(':id', item.id_komponen_gaji);
+                let editUrl = "{{ route('komponen_gajis.edit', ':id') }}".replace(':id', item.id_komponen_gaji);
+                let destroyUrl = "{{ route('komponen_gajis.destroy', ':id') }}".replace(':id', item.id_komponen_gaji);
 
                 let actions = `
                 <a href="${showUrl}" class="btn btn-info btn-sm me-1">View</a>
@@ -66,7 +66,7 @@
                     <td>${ item.kategori == 'gaji_pokok' ? 'Gaji Pokok' : (item.kategori == 'tunjangan_melekat' ? 'Tunjangan Melekat' : 'Tunjangan Lain') }</td>
                     <td>${ item.jabatan == 'ketua' ? 'Ketua' : (item.jabatan == 'wakil_ketua' ? 'Wakil Ketua' : ( item.jabatan == 'anggota' ? 'Anggota' : 'Semua')) }</td>
                     <td>${ item.nominal }</td>
-                    <td>${ item.satuan == 'bulan' ? 'Bulan' : 'Periode'}</td>
+                    <td>${ item.satuan == 'bulan' ? 'Bulan' : 'Periode' }</td>
                     <td>${ actions }</td>
                 </tr>
             `;

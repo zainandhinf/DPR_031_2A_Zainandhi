@@ -65,7 +65,7 @@
                         </li>
                         <li class="nav-item">
                             <a class="nav-link {{ $title == 'Komponen Gaji' ? 'active' : '' }}"
-                                href="{{ route('komponengajis.index') }}">Komponen Gaji</a>
+                                href="{{ route('komponen_gajis.index') }}">Komponen Gaji</a>
                         </li>
                     @endif
                 </ul>

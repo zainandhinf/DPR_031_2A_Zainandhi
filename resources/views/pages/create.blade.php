@@ -148,7 +148,7 @@
             </div>
 
             <button type="submit" class="btn btn-primary">Create</button>
-            <a href="{{ route('komponengajis.index') }}" class="btn btn-secondary">Cancel</a>
+            <a href="{{ route('komponen_gajis.index') }}" class="btn btn-secondary">Cancel</a>
         </form>
     @endif
 @endsection
