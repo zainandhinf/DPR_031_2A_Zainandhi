@@ -10,17 +10,24 @@ class PenggunaController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $items = Pengguna::all();
-        return view(
-            'pages.pengguna',
-            [
-                'title' => 'Pengguna',
-                'items' => $items,
-            ]
-        );
+        $search = $request->input('search');
 
+        $items = Pengguna::query()
+            ->when($search, function ($query, $search) {
+                $query->where('username', 'like', "%{$search}%")
+                    ->orWhere('email', 'like', "%{$search}%")
+                    ->orWhere('nama_depan', 'like', "%{$search}%")
+                    ->orWhere('nama_belakang', 'like', "%{$search}%")
+                    ->orWhere('role', 'like', "%{$search}%");
+            })
+            ->get();
+
+        return view('pages.pengguna', [
+            'title' => 'Pengguna',
+            'items' => $items,
+        ]);
     }
 
     /**

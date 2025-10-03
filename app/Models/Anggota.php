@@ -12,6 +12,7 @@ class Anggota extends Model
     protected $keyType = 'int';  
 
     protected $fillable = [
+        'id_anggota',
         'nama_depan',
         'nama_belakang',
         'gelar_depan',

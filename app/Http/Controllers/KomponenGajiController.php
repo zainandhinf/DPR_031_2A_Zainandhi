@@ -10,9 +10,25 @@ class KomponenGajiController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        //
+        $search = $request->input('search');
+
+        $items = KomponenGaji::query()
+            ->when($search, function ($query, $search) {
+                $query->where('nama_komponen', 'like', "%{$search}%")
+                    ->orWhere('kategori', 'like', "%{$search}%")
+                    ->orWhere('jabatan', 'like', "%{$search}%")
+                    ->orWhere('nominal', 'like', "%{$search}%")
+                    ->orWhere('satuan', 'like', "%{$search}%")
+                    ->orWhere('id_komponen_gaji', 'like', "%{$search}%");
+            })
+            ->get();
+
+        return view('pages.komponengaji', [
+            'title' => 'Komponen Gaji',
+            'items' => $items,
+        ]);
     }
 
     /**
@@ -20,7 +36,16 @@ class KomponenGajiController extends Controller
      */
     public function create()
     {
-        //
+        $lastId = KomponenGaji::orderBy('id_komponen_gaji', 'desc')->value('id_komponen_gaji');
+
+        $nextId = $lastId ? $lastId + 1 : 1;
+        return view(
+            'pages.create',
+            [
+                'title' => 'Komponen Gaji',
+                'nextId' => $nextId
+            ]
+        );
     }
 
     /**
@@ -28,7 +53,18 @@ class KomponenGajiController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $validated = $request->validate([
+            'id_komponen_gaji' => 'required|max:20|unique:komponen_gajis,id_komponen_gaji',
+            'nama_komponen' => 'required|max:100',
+            'kategori' => 'required',
+            'jabatan' => 'required',
+            'nominal' => 'required|numeric',
+            'satuan' => 'required',
+        ]);
+
+        KomponenGaji::create($validated);
+
+        return redirect()->route('komponengajis.index')->with('success', 'Data added successfully!!');
     }
 
     /**

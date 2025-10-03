@@ -10,17 +10,23 @@ class AnggotaController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $items = Anggota::all();
-        return view(
-            'pages.anggota',
-            [
-                'title' => 'Anggota',
-                'items' => $items,
-            ]
-        );
+        $search = $request->input('search');
 
+        $items = Anggota::query()
+            ->when($search, function ($query, $search) {
+                $query->where('nama_depan', 'like', "%{$search}%")
+                    ->orWhere('nama_belakang', 'like', "%{$search}%")
+                    ->orWhere('jabatan', 'like', "%{$search}%")
+                    ->orWhere('id_anggota', 'like', "%{$search}%");
+            })
+            ->get();
+
+        return view('pages.anggota', [
+            'title' => 'Anggota',
+            'items' => $items,
+        ]);
     }
 
     /**
@@ -28,13 +34,16 @@ class AnggotaController extends Controller
      */
     public function create()
     {
+        $lastId = Anggota::orderBy('id_anggota', 'desc')->value('id_anggota');
+
+        $nextId = $lastId ? $lastId + 1 : 1;
         return view(
             'pages.create',
             [
                 'title' => 'Anggota',
+                'nextId' => $nextId,
             ]
         );
-
     }
 
     /**
@@ -43,6 +52,7 @@ class AnggotaController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
+            'id_anggota' => 'required|unique:anggotas,id_anggota',
             'nama_depan' => 'required|max:100',
             'nama_belakang' => 'required|max:100',
             'gelar_depan' => 'required|max:50',
@@ -54,7 +64,6 @@ class AnggotaController extends Controller
         Anggota::create($validated);
 
         return redirect()->route('anggotas.index')->with('success', 'Data added successfully!!');
-
     }
 
     /**
@@ -87,6 +96,7 @@ class AnggotaController extends Controller
     public function update(Request $request, Anggota $anggota)
     {
         $validated = $request->validate([
+            'id_anggota' => 'required|max:20|unique:anggotas,id_anggota',
             'nama_depan' => 'required|max:100',
             'nama_belakang' => 'required|max:100',
             'gelar_depan' => 'required|max:50',

@@ -12,9 +12,9 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('komponen_gajis', function (Blueprint $table) {
-            $table->id('id_komponen_gaji');
+            $table->bigInteger('id_komponen_gaji')->primary();
             $table->string('nama_komponen', 100);
-            $table->enum('kategori', ['gaji_pokok', 'tunjangan_melekat', 'tunjangan_lain']);
+            $table->enum('kategori', ['gaji_pokok', 'tunjangan_melekat', 'tunjangan_lain', 'semua']);
             $table->enum('jabatan', ['ketua', 'wakil_ketua', 'anggota']);
             $table->decimal('nominal', 17, 2);
             $table->enum('satuan', ['bulan', 'periode']);

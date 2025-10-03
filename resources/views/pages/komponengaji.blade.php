@@ -2,7 +2,10 @@
 
 @section('content')
     <div class="container mt-4">
-        <h2 class="mb-3">Data Pengguna</h2>
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h2>Data Komponen Gaji</h2>
+            <a href="{{ route('komponengajis.create') }}" class="btn btn-primary">Add Data</a>
+        </div>
 
         <form method="GET" action="{{ url()->current() }}" class="d-flex mb-3">
             <input type="text" name="search" value="{{ request('search') }}" class="form-control me-2"
@@ -14,12 +17,12 @@
             <table class="table table-striped table-hover align-middle text-center">
                 <thead class="table-dark">
                     <tr>
-                        <th>ID Pengguna</th>
-                        <th>Username</th>
-                        <th>Email</th>
-                        <th>Nama Depan</th>
-                        <th>Nama Belakang</th>
-                        <th>Role</th>
+                        <th>ID Komponen Gaji</th>
+                        <th>Nama Komponen</th>
+                        <th>Kategori</th>
+                        <th>Jabatan</th>
+                        <th>Nominal</th>
+                        <th>Satuan</th>
                         <th>Action</th>
                     </tr>
                 </thead>
@@ -37,16 +40,18 @@
         if (items.length === 0) {
             tbody.innerHTML = `
             <tr>
-                <td colspan="4" class="text-center text-muted">Data not found</td>
+                <td colspan="7" class="text-muted text-center">Data not found</td>
             </tr>
         `;
         } else {
             items.forEach(item => {
-                let showUrl = "{{ route('penggunas.show', ':id') }}".replace(':id', item.id);
-                let destroyUrl = "{{ route('penggunas.destroy', ':id') }}".replace(':id', item.id);
+                let showUrl = "{{ route('komponengajis.show', ':id') }}".replace(':id', item.id_komponen_gaji);
+                let editUrl = "{{ route('komponengajis.edit', ':id') }}".replace(':id', item.id_komponen_gaji);
+                let destroyUrl = "{{ route('komponengajis.destroy', ':id') }}".replace(':id', item.id_komponen_gaji);
 
                 let actions = `
                 <a href="${showUrl}" class="btn btn-info btn-sm me-1">View</a>
+                <a href="${editUrl}" class="btn btn-warning btn-sm me-1">Edit</a>
                 <form action="${destroyUrl}" method="POST" class="d-inline deleteForm">
                     @csrf
                     @method('DELETE')
@@ -56,12 +61,12 @@
 
                 let row = `
                 <tr>
-                    <td>${ item.id_pengguna }</td>
-                    <td>${ item.username }</td>
-                    <td>${ item.email }</td>
-                    <td>${ item.nama_depan }</td>
-                    <td>${ item.nama_belakang }</td>
-                    <td><span class="badge bg-primary">${ item.role }</span></td>
+                    <td>${ item.id_komponen_gaji }</td>
+                    <td>${ item.nama_komponen }</td>
+                    <td>${ item.kategori == 'gaji_pokok' ? 'Gaji Pokok' : (item.kategori == 'tunjangan_melekat' ? 'Tunjangan Melekat' : 'Tunjangan Lain') }</td>
+                    <td>${ item.jabatan == 'ketua' ? 'Ketua' : (item.jabatan == 'wakil_ketua' ? 'Wakil Ketua' : ( item.jabatan == 'anggota' ? 'Anggota' : 'Semua')) }</td>
+                    <td>${ item.nominal }</td>
+                    <td>${ item.satuan == 'bulan' ? 'Bulan' : 'Periode'}</td>
                     <td>${ actions }</td>
                 </tr>
             `;
