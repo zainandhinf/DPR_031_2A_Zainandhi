@@ -26,13 +26,18 @@ class PenggajianController extends Controller
             'anggotas.gelar_belakang',
             'anggotas.jabatan',
             DB::raw("SUM(
-            CASE 
-                WHEN komponen_gajis.satuan = 'bulan' THEN 
-                    komponen_gajis.nominal * CASE WHEN anggotas.jml_anak > 0 THEN LEAST(anggotas.jml_anak, 2) ELSE 1 END
-                ELSE 0
-            END
-        ) as take_home_pay_per_bulan"),
-            DB::raw("SUM(CASE WHEN komponen_gajis.satuan = 'periode' THEN komponen_gajis.nominal ELSE 0 END) as take_home_pay_per_periode")
+        CASE 
+            WHEN komponen_gajis.satuan = 'bulan' THEN 
+                komponen_gajis.nominal * CASE WHEN anggotas.jml_anak > 0 THEN LEAST(anggotas.jml_anak, 2) ELSE 1 END
+            ELSE 0
+        END
+    ) as take_home_pay_per_bulan"),
+            DB::raw("SUM(
+        CASE 
+            WHEN komponen_gajis.satuan = 'periode' THEN komponen_gajis.nominal
+            ELSE 0
+        END
+    ) as take_home_pay_per_periode")
         )
             ->join('anggotas', 'penggajians.id_anggota', '=', 'anggotas.id_anggota')
             ->join('komponen_gajis', 'penggajians.id_komponen_gaji', '=', 'komponen_gajis.id_komponen_gaji')
@@ -45,16 +50,26 @@ class PenggajianController extends Controller
                 'anggotas.jabatan'
             )
             ->when($search, function ($query, $search) {
-                $query->having(function ($having) use ($search) {
-                    $having->where('anggotas.id_anggota', 'like', "%{$search}%")
-                        ->orWhere('anggotas.nama_depan', 'like', "%{$search}%")
-                        ->orWhere('anggotas.nama_belakang', 'like', "%{$search}%")
-                        ->orWhere('anggotas.jabatan', 'like', "%{$search}%")
-                        ->orWhere(DB::raw("SUM(CASE WHEN komponen_gajis.satuan = 'bulan' THEN komponen_gajis.nominal ELSE 0 END)"), 'like', "%{$search}%")
-                        ->orWhere(DB::raw("SUM(CASE WHEN komponen_gajis.satuan = 'periode' THEN komponen_gajis.nominal ELSE 0 END)"), 'like', "%{$search}%");
-                });
+                $query->havingRaw("anggotas.id_anggota LIKE ?", ["%{$search}%"])
+                    ->orHavingRaw("anggotas.nama_depan LIKE ?", ["%{$search}%"])
+                    ->orHavingRaw("anggotas.nama_belakang LIKE ?", ["%{$search}%"])
+                    ->orHavingRaw("anggotas.jabatan LIKE ?", ["%{$search}%"])
+                    ->orHavingRaw("SUM(
+                CASE 
+                    WHEN komponen_gajis.satuan = 'bulan' THEN 
+                        komponen_gajis.nominal * CASE WHEN anggotas.jml_anak > 0 THEN LEAST(anggotas.jml_anak, 2) ELSE 1 END
+                    ELSE 0
+                END
+            ) LIKE ?", ["%{$search}%"])
+                    ->orHavingRaw("SUM(
+                CASE 
+                    WHEN komponen_gajis.satuan = 'periode' THEN komponen_gajis.nominal
+                    ELSE 0
+                END
+            ) LIKE ?", ["%{$search}%"]);
             })
             ->get();
+
 
         return view('pages.penggajian', [
             'title' => 'Penggajian',
@@ -199,7 +214,6 @@ class PenggajianController extends Controller
 
         return view('pages.edit', [
             'title' => 'Penggajian',
-            // 'anggota' => $anggota,
             'item' => $item
         ]);
     }
@@ -234,6 +248,10 @@ class PenggajianController extends Controller
      */
     public function destroy($id_anggota, $id_komponen_gaji)
     {
-        //
+        Penggajian::where('id_anggota', $id_anggota)
+            ->where('id_komponen_gaji', $id_komponen_gaji)
+            ->delete();
+
+        return redirect()->route('penggajians.show', $id_anggota)->with('success', 'Data successfully deleted!!');
     }
 }

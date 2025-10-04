@@ -36,6 +36,11 @@
     <script>
         let items = @json($items);
         let tbody = document.getElementById("tableBody");
+        const formatRupiah = new Intl.NumberFormat('id-ID', {
+            style: 'currency',
+            currency: 'IDR',
+            minimumFractionDigits: 0
+        });
 
         if (items.length === 0) {
             tbody.innerHTML = `
@@ -65,7 +70,7 @@
                     <td>${ item.nama_komponen }</td>
                     <td>${ item.kategori == 'gaji_pokok' ? 'Gaji Pokok' : (item.kategori == 'tunjangan_melekat' ? 'Tunjangan Melekat' : 'Tunjangan Lain') }</td>
                     <td>${ item.jabatan == 'ketua' ? 'Ketua' : (item.jabatan == 'wakil_ketua' ? 'Wakil Ketua' : ( item.jabatan == 'anggota' ? 'Anggota' : 'Semua')) }</td>
-                    <td>${ item.nominal }</td>
+                    <td>${ formatRupiah.format(item.nominal) }</td>
                     <td>${ item.satuan == 'bulan' ? 'Bulan' : 'Periode' }</td>
                     <td>${ actions }</td>
                 </tr>
