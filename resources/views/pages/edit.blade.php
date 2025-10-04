@@ -162,5 +162,63 @@
             <button type="submit" class="btn btn-primary">Update</button>
             <a href="{{ route('komponen_gajis.index') }}" class="btn btn-secondary">Cancel</a>
         </form>
+    @elseif($title == 'Penggajian')
+        <form
+            action="{{ route('penggajians.update', ['id_anggota' => $item->id_anggota, 'id_komponen_gaji' => $item->id_komponen_gaji]) }}"
+            method="POST">
+            @csrf
+            @method('PUT')
+
+            <div class="mb-3">
+                <label class="form-label">ID Anggota</label>
+                <input type="text" class="form-control" value="{{ $item->id_anggota }}" readonly>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Komponen Gaji</label>
+                <select id="id_komponen_gaji" name="id_komponen_gaji"
+                    class="form-control @error('id_komponen_gaji') is-invalid @enderror" required>
+                    <option value="">-- Pilih --</option>
+                </select>
+                @error('id_komponen_gaji')
+                    <div class="invalid-feedback">{{ $message }}</div>
+                @enderror
+            </div>
+
+            <button type="submit" class="btn btn-primary">Update</button>
+            <a href="{{ route('penggajians.show', $item->id_anggota) }}" class="btn btn-secondary">Cancel</a>
+        </form>
     @endif
+@endsection
+
+@section('script')
+<script>
+        // Menampilkan data komponen gaji sesuai jabatan pada input selection
+        document.addEventListener('DOMContentLoaded', function() {
+            const komponenSelect = document.getElementById('id_komponen_gaji');
+            const anggotaId = "{{ $item->id_anggota }}";
+            const selectedKomponenId = "{{ $item->id_komponen_gaji }}";
+
+            komponenSelect.innerHTML = '<option value="">-- Pilih --</option>';
+
+            if (anggotaId) {
+                fetch(`/penggajians/get-komponen/${anggotaId}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        data.forEach(item => {
+                            const option = document.createElement('option');
+                            option.value = item.id_komponen_gaji;
+                            option.textContent = item.nama_komponen;
+
+                            if (item.id_komponen_gaji == selectedKomponenId) {
+                                option.selected = true;
+                            }
+
+                            komponenSelect.appendChild(option);
+                        });
+                    })
+                    .catch(error => console.error('Error:', error));
+            }
+        });
+    </script>
 @endsection

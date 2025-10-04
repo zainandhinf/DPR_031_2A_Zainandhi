@@ -25,7 +25,13 @@ class PenggajianController extends Controller
             'anggotas.nama_belakang',
             'anggotas.gelar_belakang',
             'anggotas.jabatan',
-            DB::raw("SUM(CASE WHEN komponen_gajis.satuan = 'bulan' THEN komponen_gajis.nominal ELSE 0 END) as take_home_pay_per_bulan"),
+            DB::raw("SUM(
+            CASE 
+                WHEN komponen_gajis.satuan = 'bulan' THEN 
+                    komponen_gajis.nominal * CASE WHEN anggotas.jml_anak > 0 THEN LEAST(anggotas.jml_anak, 2) ELSE 1 END
+                ELSE 0
+            END
+        ) as take_home_pay_per_bulan"),
             DB::raw("SUM(CASE WHEN komponen_gajis.satuan = 'periode' THEN komponen_gajis.nominal ELSE 0 END) as take_home_pay_per_periode")
         )
             ->join('anggotas', 'penggajians.id_anggota', '=', 'anggotas.id_anggota')
@@ -148,11 +154,15 @@ class PenggajianController extends Controller
         $anggota = Anggota::where('id_anggota', $id_anggota)->firstOrFail();
 
         $komponenGaji = Penggajian::join('komponen_gajis', 'penggajians.id_komponen_gaji', '=', 'komponen_gajis.id_komponen_gaji')
+            ->join('anggotas', 'penggajians.id_anggota', '=', 'anggotas.id_anggota')
             ->where('penggajians.id_anggota', $id_anggota)
             ->select(
                 'penggajians.id_komponen_gaji',
                 'komponen_gajis.nama_komponen',
-                'komponen_gajis.nominal',
+                DB::raw('CASE 
+                    WHEN anggotas.jml_anak > 0 THEN komponen_gajis.nominal * LEAST(anggotas.jml_anak, 2)
+                    ELSE komponen_gajis.nominal
+                END as nominal'),
                 'komponen_gajis.satuan'
             )
             ->get();
@@ -172,20 +182,51 @@ class PenggajianController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(Penggajian $penggajian)
+    public function edit($id_anggota, $id_komponen_gaji)
     {
+        $item = Penggajian::join('komponen_gajis', 'komponen_gajis.id_komponen_gaji', '=', 'penggajians.id_komponen_gaji')
+            ->join('anggotas', 'anggotas.id_anggota', '=', 'penggajians.id_anggota')
+            ->where('penggajians.id_anggota', $id_anggota)
+            ->where('komponen_gajis.id_komponen_gaji', $id_komponen_gaji)
+            ->select(
+                'penggajians.id_anggota',
+                'penggajians.id_komponen_gaji',
+                'komponen_gajis.nama_komponen',
+                'komponen_gajis.nominal',
+                'komponen_gajis.satuan'
+            )
+            ->firstOrFail();
+
         return view('pages.edit', [
-            'title' => 'Anggota',
-            'item' => $penggajian
+            'title' => 'Penggajian',
+            // 'anggota' => $anggota,
+            'item' => $item
         ]);
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, Penggajian $penggajian)
+    public function update(Request $request, $id_anggota, $id_komponen_gaji_lama)
     {
-        //
+        $validated = $request->validate([
+            'id_komponen_gaji' => [
+                'required',
+                Rule::unique('penggajians')->where(function ($query) use ($id_anggota) {
+                    return $query->where('id_anggota', $id_anggota);
+                })->ignore($id_komponen_gaji_lama, 'id_komponen_gaji'),
+            ],
+        ], [
+            'id_komponen_gaji.unique' => 'Komponen gaji ini sudah terdaftar untuk anggota tersebut.',
+        ]);
+
+        Penggajian::where('id_anggota', $id_anggota)
+            ->where('id_komponen_gaji', $id_komponen_gaji_lama)
+            ->update([
+                'id_komponen_gaji' => $validated['id_komponen_gaji']
+            ]);
+
+        return redirect()->route('penggajians.show', $id_anggota)->with('success', 'Data updated successfully!!');
     }
 
     /**

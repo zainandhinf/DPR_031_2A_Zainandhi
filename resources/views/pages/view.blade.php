@@ -44,7 +44,9 @@
                                 </div>
                                 <div class="mb-3">
                                     <label class="form-label">Jabatan</label>
-                                    <input type="text" class="form-control" value="{{ $anggota->jabatan == 'ketua' ? 'Ketua' : ($anggota->jabatan == 'wakil_ketua' ? 'Wakil Ketua' : 'Anggota') }}" readonly>
+                                    <input type="text" class="form-control"
+                                        value="{{ $anggota->jabatan == 'ketua' ? 'Ketua' : ($anggota->jabatan == 'wakil_ketua' ? 'Wakil Ketua' : 'Anggota') }}"
+                                        readonly>
                                 </div>
                                 <h4 class="mt-4">Daftar Komponen Gaji</h4>
                                 <table class="table table-bordered">
@@ -66,14 +68,14 @@
                                                 <td>{{ ucfirst($item->satuan) }}</td>
                                                 @if (session('role') === 'admin')
                                                     <td>
-                                                        <a href="{{ route('penggajians.edit', $anggota->id_anggota) }}"
-                                                            class="btn btn-primary">Edit</a>
+                                                        <a href="{{ route('penggajians.edit', ['id_anggota' => $anggota->id_anggota, 'id_komponen_gaji' => $item->id_komponen_gaji]) }}"
+                                                            class="btn btn-warning btn-sm">Edit</a>
                                                         <form
                                                             action="{{ route('penggajians.destroy', ['id_anggota' => $anggota->id_anggota, 'id_komponen_gaji' => $item->id_komponen_gaji]) }}"
                                                             method="POST" style="display:inline;">
                                                             @csrf
                                                             @method('DELETE')
-                                                            <button type="submit" class="btn btn-danger"
+                                                            <button type="submit" class="btn btn-danger btn-sm"
                                                                 onclick="return confirm('Are you sure you want to delete this data?')">Delete</button>
                                                         </form>
                                                     </td>
