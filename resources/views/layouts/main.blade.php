@@ -68,6 +68,10 @@
                                 href="{{ route('komponen_gajis.index') }}">Komponen Gaji</a>
                         </li>
                     @endif
+                    <li class="nav-item">
+                        <a class="nav-link {{ $title == 'Penggajian' ? 'active' : '' }}"
+                            href="{{ route('penggajians.index') }}">Penggajian</a>
+                    </li>
                 </ul>
 
                 <!-- Logout -->

@@ -59,6 +59,7 @@ class AnggotaController extends Controller
             'gelar_belakang' => 'required|max:50',
             'jabatan' => 'required',
             'status_pernikahan' => 'required',
+            'jml_anak' => 'required',
         ]);
 
         Anggota::create($validated);
@@ -103,6 +104,7 @@ class AnggotaController extends Controller
             'gelar_belakang' => 'required|max:50',
             'jabatan' => 'required',
             'status_pernikahan' => 'required',
+            'jml_anak' => 'required',
         ]);
 
         $anggota->update($validated);

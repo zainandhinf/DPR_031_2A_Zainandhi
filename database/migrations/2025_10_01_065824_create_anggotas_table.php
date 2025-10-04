@@ -19,6 +19,7 @@ return new class extends Migration
             $table->string('gelar_belakang', 50);
             $table->enum('jabatan', ['ketua', 'wakil_ketua', 'anggota']);
             $table->enum('status_pernikahan', ['kawin', 'belum_kawin']);
+            $table->Integer('jml_anak')->default(0);
             $table->timestamps();
         });
     }

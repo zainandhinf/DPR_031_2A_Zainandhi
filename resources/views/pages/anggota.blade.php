@@ -26,6 +26,7 @@
                         <th>Gelar Belakang</th>
                         <th>Jabatan</th>
                         <th>Status Pernikahan</th>
+                        <th>Jumlah Anak</th>
                         @if (session('role') === 'admin')
                             <th>Action</th>
                         @endif
@@ -56,13 +57,15 @@
                 let destroyUrl = "{{ route('anggotas.destroy', ':id') }}".replace(':id', item.id_anggota);
 
                 let actions = `
-                <a href="${showUrl}" class="btn btn-info btn-sm me-1">View</a>
-                <a href="${editUrl}" class="btn btn-warning btn-sm me-1">Edit</a>
-                <form action="${destroyUrl}" method="POST" class="d-inline deleteForm">
-                    @csrf
-                    @method('DELETE')
-                    <button type="submit" class="btn btn-danger btn-sm">Delete</button>
-                </form>
+                <div class="d-flex justify-content-center align-items-center gap-1">
+                    <a href="${showUrl}" class="btn btn-info btn-sm">View</a>
+                    <a href="${editUrl}" class="btn btn-warning btn-sm">Edit</a>
+                    <form action="${destroyUrl}" method="POST" class="deleteForm m-0">
+                        @csrf
+                        @method('DELETE')
+                        <button type="submit" class="btn btn-danger btn-sm">Delete</button>
+                    </form>
+                </div>
             `;
 
                 let row = `
@@ -74,6 +77,7 @@
                     <td>${ item.gelar_belakang }</td>
                     <td>${ item.jabatan == 'ketua' ? 'Ketua' : (item.jabatan == 'wakil_ketua' ? 'Wakil Ketua' : 'Anggota') }</td>
                     <td>${ item.status_pernikahan == 'kawin' ? 'Kawin' : 'Belum Kawin' }</td>
+                    <td>${ item.jml_anak }</td>
                     <td>${ role === 'admin' ? actions : '' }</td>
                 </tr>
             `;

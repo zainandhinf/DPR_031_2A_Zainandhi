@@ -19,5 +19,6 @@ class Anggota extends Model
         'gelar_belakang',
         'jabatan',
         'status_pernikahan',
+        'jml_anak',
     ];
 }

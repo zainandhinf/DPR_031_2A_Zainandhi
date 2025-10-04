@@ -2,17 +2,37 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Anggota;
+use App\Models\KomponenGaji;
 use App\Models\Penggajian;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 
 class PenggajianController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        //
+        $search = $request->input('search');
+
+        $items = Penggajian::all();
+        // $items = Penggajian::query()
+        //     ->when($search, function ($query, $search) {
+        //         $query->where('nama_komponen', 'like', "%{$search}%")
+        //             ->orWhere('kategori', 'like', "%{$search}%")
+        //             ->orWhere('jabatan', 'like', "%{$search}%")
+        //             ->orWhere('nominal', 'like', "%{$search}%")
+        //             ->orWhere('satuan', 'like', "%{$search}%")
+        //             ->orWhere('id_komponen_gaji', 'like', "%{$search}%");
+        //     })
+        //     ->get();
+
+        return view('pages.penggajian', [
+            'title' => 'Penggajian',
+            'items' => $items,
+        ]);
     }
 
     /**
@@ -20,7 +40,60 @@ class PenggajianController extends Controller
      */
     public function create()
     {
-        //
+        $anggotas = Anggota::all();
+
+        return view(
+            'pages.create',
+            [
+                'title' => 'Penggajian',
+                'anggotas' => $anggotas,
+            ]
+        );
+    }
+
+    // Fungsi mengambil komponen sesuai jabatan, status pernikahan, dan jumlah anak jika lebih dari 0 
+    public function getKomponen($id_anggota)
+    {
+        // Ambil data anggota
+        $anggota = Anggota::find($id_anggota);
+
+        if (!$anggota) {
+            return response()->json([]);
+        }
+
+        // Ambil jabatan dari anggota
+        $jabatan = $anggota->jabatan;
+
+        // Ambil semua komponen berdasarkan jabatan
+        $komponenGajis = KomponenGaji::where('jabatan', $jabatan)
+            ->orWhere('jabatan', 'semua')
+            ->get();
+
+        // Filter tambahan: berdasarkan status kawin dan anak
+        $filtered = $komponenGajis->filter(function ($k) use ($anggota) {
+            $nama = strtolower($k->nama_komponen);
+
+            // Jika status belum kawin maka hilangkan tunjangan istri/suami dan tunjangan anak
+            if ($anggota->status_pernikahan != 'kawin' && (
+                str_contains($nama, 'tunjangan istri/suami') ||
+                str_contains($nama, 'tunjangan anak')
+            )) {
+                return false;
+            }
+
+            // Jika status kawin tapi anak 0 maka hilangkan tunjangan anak
+            if (
+                $anggota->status_pernikahan == 'kawin' &&
+                $anggota->jml_anak == 0 &&
+                str_contains($nama, 'tunjangan anak')
+            ) {
+                return false;
+            }
+
+            return true;
+        });
+
+        return response()->json($filtered->values());
     }
 
     /**
@@ -28,7 +101,21 @@ class PenggajianController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $validated = $request->validate([
+            'id_anggota' => 'required',
+            'id_komponen_gaji' => [
+                'required',
+                Rule::unique('penggajians')->where(function ($query) use ($request) {
+                    return $query->where('id_anggota', $request->id_anggota);
+                }),
+            ],
+        ], [
+            'id_komponen_gaji.unique' => 'This salary component has already been added for that member..',
+        ]);
+
+        Penggajian::create($validated);
+
+        return redirect()->route('penggajians.index')->with('success', 'Data added successfully!!');
     }
 
     /**

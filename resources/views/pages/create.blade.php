@@ -62,7 +62,7 @@
             </div>
             <div class="mb-3">
                 <label class="form-label">Status Pernikahan</label>
-                <select name="status_pernikahan"
+                <select id="status_pernikahan" name="status_pernikahan"
                     class="{{ $errors->has('status_pernikahan') ? 'border-red' : '' }} form-control" required>
                     <option value="">-- Pilih --</option>
                     <option value="kawin" {{ old('kawin') == 'kawin' ? 'selected' : '' }}>Kawin</option>
@@ -73,11 +73,20 @@
                     <div class="invalid-feedback">{{ $message }}</div>
                 @enderror
             </div>
+            <div class="mb-3" id="jumlah_anak_container" style="display: none;">
+                <label class="form-label">Jumlah Anak</label>
+                <input type="number" name="jml_anak" id="jumlah_anak" value="{{ old('jml_anak', 0) }}"
+                    class="form-control @error('jml_anak') is-invalid @enderror" min="0">
+                @error('jml_anak')
+                    <div class="invalid-feedback">{{ $message }}</div>
+                @enderror
+            </div>
 
             <button type="submit" class="btn btn-primary">Create</button>
             <a href="{{ route('anggotas.index') }}" class="btn btn-secondary">Cancel</a>
         </form>
-    {{-- FORM KOMPONEN GAJI --}}
+
+        {{-- FORM KOMPONEN GAJI --}}
     @elseif($title == 'Komponen Gaji')
         <form method="POST" action="{{ route('komponen_gajis.store') }}">
             @csrf
@@ -149,5 +158,107 @@
             <button type="submit" class="btn btn-primary">Create</button>
             <a href="{{ route('komponen_gajis.index') }}" class="btn btn-secondary">Cancel</a>
         </form>
+        {{-- FORM PENGGAJIAN --}}
+    @elseif($title == 'Penggajian')
+        <form method="POST" action="{{ route('penggajians.store') }}">
+            @csrf
+            <div class="mb-3">
+                <label class="form-label">ID Anggota</label>
+                <select id="id_anggota" name="id_anggota" class="form-control @error('id_anggota') is-invalid @enderror" required>
+                    <option value="">-- Pilih --</option>
+                    @foreach ($anggotas as $item)
+                        <option value="{{ $item->id_anggota }}">{{ $item->id_anggota }}</option>
+                    @endforeach
+                </select>
+                @error('id_anggota')
+                    <div class="invalid-feedback">{{ $message }}</div>
+                @enderror
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Komponen Gaji</label>
+                <select id="id_komponen_gaji" name="id_komponen_gaji" class="form-control @error('id_komponen_gaji') is-invalid @enderror" required>
+                    <option value="">-- Pilih --</option>
+                </select>
+                @error('id_komponen_gaji')
+                    <div class="invalid-feedback">{{ $message }}</div>
+                @enderror
+            </div>
+
+            <button type="submit" class="btn btn-primary">Create</button>
+            <a href="{{ route('penggajians.index') }}" class="btn btn-secondary">Cancel</a>
+        </form>
     @endif
+@endsection
+
+@section('script')
+    <script>
+        // Menampilakn input jumlah anak ketika status pernikahan yang dipilih kawin
+        document.addEventListener('DOMContentLoaded', function() {
+            let statusSelect = document.getElementById('status_pernikahan');
+            let jumlahAnakContainer = document.getElementById('jumlah_anak_container');
+            let jumlahAnakInput = document.getElementById('jumlah_anak');
+
+            function toggleJumlahAnak() {
+                if (statusSelect.value === 'kawin') {
+                    jumlahAnakContainer.style.display = 'block';
+                } else {
+                    jumlahAnakContainer.style.display = 'none';
+                    jumlahAnakInput.value = 0;
+                }
+            }
+
+            toggleJumlahAnak();
+
+            statusSelect.addEventListener('change', toggleJumlahAnak);
+        });
+
+        // Menampilkan data komponen gaji sesuai jabatan pada input selection
+        // document.getElementById('id_anggota').addEventListener('change', function() {
+        //     let idAnggota = this.value;
+        //     let komponenSelect = document.getElementById('id_komponen_gaji');
+
+        //     // kosongkan select dulu
+        //     komponenSelect.innerHTML = '<option value="">-- Pilih --</option>';
+
+        //     if (idAnggota) {
+        //         fetch('/get-komponen-gaji/' + idAnggota)
+        //             .then(response => response.json())
+        //             .then(data => {
+        //                 data.forEach(item => {
+        //                     let option = document.createElement('option');
+        //                     option.value = item.id_komponen_gaji;
+        //                     option.textContent = item.nama_komponen;
+        //                     komponenSelect.appendChild(option);
+        //                 });
+        //             })
+        //             .catch(error => console.error('Error:', error));
+        //     }
+        // });
+
+        // document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', function() {
+            const anggotaSelect = document.getElementById('id_anggota');
+            const komponenSelect = document.getElementById('id_komponen_gaji');
+
+            anggotaSelect.addEventListener('change', function() {
+                const anggotaId = this.value;
+
+                komponenSelect.innerHTML = '<option value="">-- Pilih --</option>';
+
+                if (anggotaId) {
+                    fetch(`/penggajians/get-komponen/${anggotaId}`)
+                        .then(response => response.json())
+                        .then(data => {
+                            data.forEach(item => {
+                                const option = document.createElement('option');
+                                option.value = item.id_komponen_gaji;
+                                option.textContent = item.nama_komponen;
+                                komponenSelect.appendChild(option);
+                            });
+                        })
+                        .catch(error => console.error('Error:', error));
+                }
+            });
+        });
+    </script>
 @endsection
