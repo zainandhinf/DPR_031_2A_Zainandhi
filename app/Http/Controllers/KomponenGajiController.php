@@ -112,6 +112,8 @@ class KomponenGajiController extends Controller
      */
     public function destroy(KomponenGaji $komponenGaji)
     {
-        //
+        $komponenGaji->delete();
+
+        return redirect()->route('komponen_gajis.index')->with('success', 'Data successfully deleted!!');
     }
 }

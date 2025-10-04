@@ -118,6 +118,6 @@ class AnggotaController extends Controller
     {
         $anggota->delete();
 
-        return redirect()->route('anggotas.index')->with('success', 'Course successfully deleted!!');
+        return redirect()->route('anggotas.index')->with('success', 'Data successfully deleted!!');
     }
 }
