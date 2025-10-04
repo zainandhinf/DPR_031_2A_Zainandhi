@@ -19,13 +19,17 @@ Route::middleware('auth')->group(function () {
     Route::get('/home', [HomeController::class, 'index']);
     Route::post('/logout', [AuthController::class, 'logout']);
     Route::resource('anggotas', AnggotaController::class);
-    Route::resource('penggajians', PenggajianController::class);
-    Route::get('/penggajians/get-komponen/{id_anggota}', [App\Http\Controllers\PenggajianController::class, 'getKomponen']);
-
-
-
+    
     Route::middleware('role:admin')->group(function () {
         Route::resource('penggunas', PenggunaController::class);
         Route::resource('komponen_gajis', KomponenGajiController::class);
+        Route::get('/penggajians/create', [PenggajianController::class, 'create'])->name('penggajians.create');
+        Route::post('penggajians', [PenggajianController::class, 'store'])->name('penggajians.store');
+        Route::get('/penggajians/{id_anggota}/edit', [PenggajianController::class, 'edit'])->name('penggajians.edit');
+        Route::delete('/penggajians/{id_anggota}/{id_komponen_gaji}', [PenggajianController::class, 'destroy'])->name('penggajians.destroy');
     });
+    
+    Route::get('penggajians', [PenggajianController::class, 'index'])->name('penggajians.index');
+    Route::get('/penggajians/get-komponen/{id_anggota}', [PenggajianController::class, 'getKomponen']);
+    Route::get('/penggajians/{id_anggota}', [PenggajianController::class, 'show'])->name('penggajians.show');
 });

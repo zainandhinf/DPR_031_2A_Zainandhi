@@ -73,7 +73,6 @@
                     <div class="invalid-feedback">{{ $message }}</div>
                 @enderror
             </div>
-            
             <button type="submit" class="btn btn-primary">Update</button>
             <a href="{{ route('anggotas.index') }}" class="btn btn-secondary">Cancel</a>
         </form>

@@ -143,9 +143,30 @@ class PenggajianController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(Penggajian $penggajian)
+    public function show($id_anggota)
     {
-        //
+        $anggota = Anggota::where('id_anggota', $id_anggota)->firstOrFail();
+
+        $komponenGaji = Penggajian::join('komponen_gajis', 'penggajians.id_komponen_gaji', '=', 'komponen_gajis.id_komponen_gaji')
+            ->where('penggajians.id_anggota', $id_anggota)
+            ->select(
+                'penggajians.id_komponen_gaji',
+                'komponen_gajis.nama_komponen',
+                'komponen_gajis.nominal',
+                'komponen_gajis.satuan'
+            )
+            ->get();
+
+        $totalBulanan = $komponenGaji->where('satuan', 'bulan')->sum('nominal');
+        $totalPeriode = $komponenGaji->where('satuan', 'periode')->sum('nominal');
+
+        return view('pages.view', [
+            'title' => 'Detail Penggajian',
+            'anggota' => $anggota,
+            'komponenGaji' => $komponenGaji,
+            'totalBulanan' => $totalBulanan,
+            'totalPeriode' => $totalPeriode
+        ]);
     }
 
     /**
@@ -153,7 +174,10 @@ class PenggajianController extends Controller
      */
     public function edit(Penggajian $penggajian)
     {
-        //
+        return view('pages.edit', [
+            'title' => 'Anggota',
+            'item' => $penggajian
+        ]);
     }
 
     /**
@@ -167,7 +191,7 @@ class PenggajianController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Penggajian $penggajian)
+    public function destroy($id_anggota, $id_komponen_gaji)
     {
         //
     }
