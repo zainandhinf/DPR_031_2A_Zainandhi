@@ -7,6 +7,7 @@ use App\Models\KomponenGaji;
 use App\Models\Penggajian;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
+use Illuminate\Support\Facades\DB;
 
 class PenggajianController extends Controller
 {
@@ -17,23 +18,44 @@ class PenggajianController extends Controller
     {
         $search = $request->input('search');
 
-        $items = Penggajian::all();
-        // $items = Penggajian::query()
-        //     ->when($search, function ($query, $search) {
-        //         $query->where('nama_komponen', 'like', "%{$search}%")
-        //             ->orWhere('kategori', 'like', "%{$search}%")
-        //             ->orWhere('jabatan', 'like', "%{$search}%")
-        //             ->orWhere('nominal', 'like', "%{$search}%")
-        //             ->orWhere('satuan', 'like', "%{$search}%")
-        //             ->orWhere('id_komponen_gaji', 'like', "%{$search}%");
-        //     })
-        //     ->get();
+        $items = Penggajian::select(
+            'anggotas.id_anggota',
+            'anggotas.gelar_depan',
+            'anggotas.nama_depan',
+            'anggotas.nama_belakang',
+            'anggotas.gelar_belakang',
+            'anggotas.jabatan',
+            DB::raw("SUM(CASE WHEN komponen_gajis.satuan = 'bulan' THEN komponen_gajis.nominal ELSE 0 END) as take_home_pay_per_bulan"),
+            DB::raw("SUM(CASE WHEN komponen_gajis.satuan = 'periode' THEN komponen_gajis.nominal ELSE 0 END) as take_home_pay_per_periode")
+        )
+            ->join('anggotas', 'penggajians.id_anggota', '=', 'anggotas.id_anggota')
+            ->join('komponen_gajis', 'penggajians.id_komponen_gaji', '=', 'komponen_gajis.id_komponen_gaji')
+            ->groupBy(
+                'anggotas.id_anggota',
+                'anggotas.gelar_depan',
+                'anggotas.nama_depan',
+                'anggotas.nama_belakang',
+                'anggotas.gelar_belakang',
+                'anggotas.jabatan'
+            )
+            ->when($search, function ($query, $search) {
+                $query->having(function ($having) use ($search) {
+                    $having->where('anggotas.id_anggota', 'like', "%{$search}%")
+                        ->orWhere('anggotas.nama_depan', 'like', "%{$search}%")
+                        ->orWhere('anggotas.nama_belakang', 'like', "%{$search}%")
+                        ->orWhere('anggotas.jabatan', 'like', "%{$search}%")
+                        ->orWhere(DB::raw("SUM(CASE WHEN komponen_gajis.satuan = 'bulan' THEN komponen_gajis.nominal ELSE 0 END)"), 'like', "%{$search}%")
+                        ->orWhere(DB::raw("SUM(CASE WHEN komponen_gajis.satuan = 'periode' THEN komponen_gajis.nominal ELSE 0 END)"), 'like', "%{$search}%");
+                });
+            })
+            ->get();
 
         return view('pages.penggajian', [
             'title' => 'Penggajian',
             'items' => $items,
         ]);
     }
+
 
     /**
      * Show the form for creating a new resource.
