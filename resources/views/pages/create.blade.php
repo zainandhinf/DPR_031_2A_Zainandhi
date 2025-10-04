@@ -79,7 +79,7 @@
         </form>
     {{-- FORM KOMPONEN GAJI --}}
     @elseif($title == 'Komponen Gaji')
-        <form method="POST" action="{{ route('komponengajis.store') }}">
+        <form method="POST" action="{{ route('komponen_gajis.store') }}">
             @csrf
             <div class="mb-3">
                 <label class="form-label">ID Komponen Gaji</label>
@@ -136,8 +136,7 @@
             </div>
             <div class="mb-3">
                 <label class="form-label">Satuan</label>
-                <select name="satuan"
-                    class="{{ $errors->has('satuan') ? 'border-red' : '' }} form-control" required>
+                <select name="satuan" class="{{ $errors->has('satuan') ? 'border-red' : '' }} form-control" required>
                     <option value="">-- Pilih --</option>
                     <option value="bulan" {{ old('bulan') == 'bulan' ? 'selected' : '' }}>Bulan</option>
                     <option value="periode" {{ old('periode') == 'periode' ? 'selected' : '' }}>Periode</option>

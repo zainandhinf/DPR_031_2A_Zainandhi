@@ -83,7 +83,10 @@ class KomponenGajiController extends Controller
      */
     public function edit(KomponenGaji $komponenGaji)
     {
-        //
+        return view('pages.edit', [
+            'title' => 'Komponen Gaji',
+            'item' => $komponenGaji
+        ]);
     }
 
     /**
@@ -91,7 +94,17 @@ class KomponenGajiController extends Controller
      */
     public function update(Request $request, KomponenGaji $komponenGaji)
     {
-        //
+        $validated = $request->validate([
+            'nama_komponen' => 'required|max:100',
+            'kategori' => 'required',
+            'jabatan' => 'required',
+            'nominal' => 'required|numeric',
+            'satuan' => 'required',
+        ]);
+
+        $komponenGaji->update($validated);
+
+        return redirect()->route('komponen_gajis.index')->with('success', 'Data updated successfully!!');
     }
 
     /**
