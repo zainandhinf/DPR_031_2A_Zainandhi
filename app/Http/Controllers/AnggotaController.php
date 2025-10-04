@@ -97,7 +97,6 @@ class AnggotaController extends Controller
     public function update(Request $request, Anggota $anggota)
     {
         $validated = $request->validate([
-            'id_anggota' => 'required|max:20|unique:anggotas,id_anggota',
             'nama_depan' => 'required|max:100',
             'nama_belakang' => 'required|max:100',
             'gelar_depan' => 'required|max:50',

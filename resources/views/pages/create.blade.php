@@ -167,7 +167,7 @@
                 <select id="id_anggota" name="id_anggota" class="form-control @error('id_anggota') is-invalid @enderror" required>
                     <option value="">-- Pilih --</option>
                     @foreach ($anggotas as $item)
-                        <option value="{{ $item->id_anggota }}">{{ $item->id_anggota }}</option>
+                        <option value="{{ $item->id_anggota }}">{{ $item->id_anggota }} ({{ $item->nama_depan }} {{ $item->nama_belakang }})</option>
                     @endforeach
                 </select>
                 @error('id_anggota')
@@ -213,30 +213,7 @@
         });
 
         // Menampilkan data komponen gaji sesuai jabatan pada input selection
-        // document.getElementById('id_anggota').addEventListener('change', function() {
-        //     let idAnggota = this.value;
-        //     let komponenSelect = document.getElementById('id_komponen_gaji');
-
-        //     // kosongkan select dulu
-        //     komponenSelect.innerHTML = '<option value="">-- Pilih --</option>';
-
-        //     if (idAnggota) {
-        //         fetch('/get-komponen-gaji/' + idAnggota)
-        //             .then(response => response.json())
-        //             .then(data => {
-        //                 data.forEach(item => {
-        //                     let option = document.createElement('option');
-        //                     option.value = item.id_komponen_gaji;
-        //                     option.textContent = item.nama_komponen;
-        //                     komponenSelect.appendChild(option);
-        //                 });
-        //             })
-        //             .catch(error => console.error('Error:', error));
-        //     }
-        // });
-
-        // document.addEventListener('DOMContentLoaded', function() {
-        document.addEventListener('DOMContentLoaded', function() {
+            document.addEventListener('DOMContentLoaded', function() {
             const anggotaSelect = document.getElementById('id_anggota');
             const komponenSelect = document.getElementById('id_komponen_gaji');
 

@@ -25,6 +25,7 @@ class PenggajianController extends Controller
             'anggotas.nama_belakang',
             'anggotas.gelar_belakang',
             'anggotas.jabatan',
+            'anggotas.jml_anak',
             DB::raw("SUM(
         CASE 
             WHEN komponen_gajis.satuan = 'bulan' THEN 

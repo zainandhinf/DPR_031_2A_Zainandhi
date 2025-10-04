@@ -10,6 +10,14 @@
             @csrf
             @method('PUT')
             <div class="mb-3">
+                <label class="form-label">ID Anggota</label>
+                <input type="text" name="id_anggota" value="{{ old('id_anggota', $item->id_anggota) }}"
+                    class="form-control @error('id_anggota') is-invalid @enderror" readonly>
+                @error('id_anggota')
+                    <div class="invalid-feedback">{{ $message }}</div>
+                @enderror
+            </div>
+            <div class="mb-3">
                 <label class="form-label">Nama Depan</label>
                 <input type="text" name="nama_depan" value="{{ old('nama_depan', $item->nama_depan) }}"
                     class="form-control @error('nama_depan') is-invalid @enderror" required>
@@ -70,6 +78,14 @@
                         Belum Kawin</option>
                 </select>
                 @error('status_pernikahan')
+                    <div class="invalid-feedback">{{ $message }}</div>
+                @enderror
+            </div>
+            <div class="mb-3" id="jumlah_anak_container">
+                <label class="form-label">Jumlah Anak</label>
+                <input type="number" name="jml_anak" id="jumlah_anak" value="{{ old('jml_anak', $item->jml_anak) }}"
+                    class="form-control @error('jml_anak') is-invalid @enderror" min="0">
+                @error('jml_anak')
                     <div class="invalid-feedback">{{ $message }}</div>
                 @enderror
             </div>
@@ -192,7 +208,7 @@
 @endsection
 
 @section('script')
-<script>
+    <script>
         // Menampilkan data komponen gaji sesuai jabatan pada input selection
         document.addEventListener('DOMContentLoaded', function() {
             const komponenSelect = document.getElementById('id_komponen_gaji');

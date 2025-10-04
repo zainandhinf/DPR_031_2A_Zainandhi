@@ -14,8 +14,9 @@
                             <p class="card-text"><strong>Nama Belakang:</strong> {{ $item->nama_belakang }}</p>
                             <p class="card-text"><strong>Gelar Depan:</strong> {{ $item->gelar_depan }}</p>
                             <p class="card-text"><strong>Gelar Belakang:</strong> {{ $item->gelar_belakang }}</p>
-                            <p class="card-text"><strong>Jabatan:</strong> {{ $item->jabatan }}</p>
-                            <p class="card-text"><strong>Status Pernikahan</strong> {{ $item->status_pernikahan }}</p>
+                            <p class="card-text"><strong>Jabatan:</strong> {{ $item->jabatan == 'ketua' ? 'Ketua' : ($item->jabatan == 'wakil_ketua' ? 'Wakil Ketua' : 'Anggota') }}</p>
+                            <p class="card-text"><strong>Status Pernikahan</strong> {{ $item->status_pernikahan == 'kawin' ? 'Kawin' : 'Belum Kawin' }}</p>
+                            <p class="card-text"><strong>Jumlah Anak:</strong> {{ $item->jml_anak }}</p>
                             <a href="{{ route('anggotas.index') }}" class="btn btn-secondary mt-3">Back</a>
                         @elseif($title == 'Detail Komponen Gaji')
                             <p class="card-text"><strong>ID Komponen Gaji:</strong> {{ $item->id_komponen_gaji }}</p>
@@ -26,7 +27,7 @@
                             <p class="card-text"><strong>Jabatan:</strong>
                                 {{ $item->jabatan == 'ketua' ? 'Ketua' : ($item->jabatan == 'wakil_ketua' ? 'Wakil Ketua' : ($item->jabatan == 'anggota' ? 'Anggota' : 'Semua')) }}
                             </p>
-                            <p class="card-text"><strong>Nominal:</strong> {{ $item->nominal }}</p>
+                            <p class="card-text"><strong>Nominal:</strong> Rp{{ number_format($item->nominal, 0, ',', '.') }}</p>
                             <p class="card-text"><strong>Satuan</strong>
                                 {{ $item->satuan == 'bulan' ? 'Bulan' : 'Periode' }}</p>
                             <a href="{{ route('komponen_gajis.index') }}" class="btn btn-secondary mt-3">Back</a>
@@ -64,7 +65,7 @@
                                         @foreach ($komponenGaji as $item)
                                             <tr>
                                                 <td>{{ $item->nama_komponen }}</td>
-                                                <td>Rp{{ number_format($item->nominal, 0, ',', '.') }}</td>
+                                                <td>Rp{{ number_format($item->nominal * $anggota->jml_anak, 0, ',', '.') }}</td>
                                                 <td>{{ ucfirst($item->satuan) }}</td>
                                                 @if (session('role') === 'admin')
                                                     <td>
